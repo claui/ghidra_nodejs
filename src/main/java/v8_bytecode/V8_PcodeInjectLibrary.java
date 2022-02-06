@@ -15,7 +15,6 @@ import ghidra.program.model.listing.Program;
 
 public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 	private Set<String> implementedOps;
-	private SleighLanguage language;
 
 	public V8_PcodeInjectLibrary(SleighLanguage l) {
 		super(l);
