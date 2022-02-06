@@ -23,7 +23,7 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 
 	@Override
 	public PcodeOp[] getPcode(Program program, InjectContext context) {
-		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 
+		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 		Address opAddr = context.baseAddr;
 		Integer callerParamsCount;
 		Integer argIndex = 0;
@@ -31,7 +31,7 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 		Instruction instruction = program.getListing().getInstructionAt(opAddr);
 		Object[] opObjects = instruction.getOpObjects(2);
 		String[] args = new String[opObjects.length + 1];
-		
+
 		try {
 			callerParamsCount = program.getListing().getFunctionContaining(opAddr).getParameterCount();
 		}
@@ -40,7 +40,7 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 		}
 		if (callerParamsCount >  opObjects.length) {
 			callerParamsCount = opObjects.length;
-		}	
+		}
 		for (; callerArgIndex < callerParamsCount; callerArgIndex++) {
 			pCode.emitPushCat1Value("a" + callerArgIndex);
 		}

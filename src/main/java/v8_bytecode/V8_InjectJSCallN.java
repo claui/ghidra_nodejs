@@ -24,14 +24,14 @@ public PcodeOp[] getPcode(Program program, InjectContext context) {
 	Integer callerParamsCount;
 	Integer argIndex = 0;
 	Integer callerArgIndex = 0;
-	
-	V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 
+
+	V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 	Address opAddr = context.baseAddr;
 	Instruction instruction = program.getListing().getInstructionAt(opAddr);
 	// get arguments from slaspec, definition in cspec
 	Integer argcount = (int) context.inputlist.get(0).getOffset();
 	Integer receiver = (int) context.inputlist.get(1).getOffset();
-	
+
 
 	ArrayList<Object> opArrList = new ArrayList<Object>();
 	for (int i = 0; i < argcount; i++) {
@@ -49,7 +49,7 @@ public PcodeOp[] getPcode(Program program, InjectContext context) {
 	// it does not match the logic of the node.exe but important for output quality
 	if (callerParamsCount >  opObjects.length) {
 		callerParamsCount = opObjects.length;
-	}	
+	}
 	for (; callerArgIndex < callerParamsCount; callerArgIndex++) {
 		pCode.emitPushCat1Value("a" + callerArgIndex);
 	}

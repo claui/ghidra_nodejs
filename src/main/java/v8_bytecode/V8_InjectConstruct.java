@@ -23,7 +23,7 @@ public class V8_InjectConstruct extends V8_InjectPayload {
 
 	@Override
 	public PcodeOp[] getPcode(Program program, InjectContext context) {
-		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 	
+		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 		Symbol useropSym = language.getSymbolTable().findGlobalSymbol("Construct");
 		Address opAddr = context.baseAddr;
 		Instruction instruction = program.getListing().getInstructionAt(opAddr);

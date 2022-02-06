@@ -22,7 +22,7 @@ public class V8_InjectStaDataPropertyInLiteral extends V8_InjectPayload {
 		Integer caleeArgsCount = 5;
 		Integer runtimeType = 2;
 		Integer index = 323; // Runtime::kDefineDataPropertyInLiteral
-		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 
+		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 		Address opAddr = context.baseAddr;
 		Instruction instruction = program.getListing().getInstructionAt(opAddr);
 		try {
@@ -33,11 +33,11 @@ public class V8_InjectStaDataPropertyInLiteral extends V8_InjectPayload {
 		}
 		// get caller args count to save only necessary ones
 		// it does not match the logic of the node.exe but important for output quality
-		pCode.emitAssignVarnodeFromPcodeOpCall("call_target", 4, "cpool", "0", "0x" + opAddr.toString(), index.toString(), 
+		pCode.emitAssignVarnodeFromPcodeOpCall("call_target", 4, "cpool", "0", "0x" + opAddr.toString(), index.toString(),
 				runtimeType.toString());
 		if (callerParamsCount >  caleeArgsCount) {
 			callerParamsCount = caleeArgsCount;
-		}	
+		}
 		for (; callerArgIndex < callerParamsCount; callerArgIndex++) {
 			pCode.emitPushCat1Value("a" + callerArgIndex);
 		}
@@ -53,7 +53,7 @@ public class V8_InjectStaDataPropertyInLiteral extends V8_InjectPayload {
 		pCode.emitAssignConstantToRegister("a4",  (int) instruction.getScalar(2).getValue());
 		// make call
 		pCode.emitVarnodeCall("call_target", 4);
-	
+
 		while (callerArgIndex > 0) {
 			callerArgIndex--;
 			pCode.emitPopCat1Value("a" + callerArgIndex);

@@ -13,16 +13,16 @@ public class V8_InjectThrow  extends V8_InjectPayload {
 		// TODO Auto-generated constructor stub
 	}
 
-	
+
 	@Override
 	public PcodeOp[] getPcode(Program program, InjectContext context) {
 		Integer callerParamsCount;
 		Integer argIndex = 0;
 		Integer callerArgIndex = 0;
 		Integer fIdx = 0;
-		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 
+		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 		Address opAddr = context.baseAddr;
-		
+
 		Instruction instruction = program.getListing().getInstructionAt(opAddr);
 		// get arguments from slaspec, definition in cspec
 		Integer condition = (int) context.inputlist.get(0).getOffset();

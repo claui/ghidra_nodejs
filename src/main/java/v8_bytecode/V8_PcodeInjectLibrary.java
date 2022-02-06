@@ -35,16 +35,16 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 		implementedOps.add("CallVariadicCallOther");
 		implementedOps.add("JSCallNCallOther");
 		implementedOps.add("ConstructCallOther");
-		implementedOps.add("CallJSRuntimeCallOther"); 
+		implementedOps.add("CallJSRuntimeCallOther");
 		implementedOps.add("ThrowCallOther");
 		implementedOps.add("StaDataPropertyInLiteralCallOther");
 	}
-	
+
 	@Override
 	public ConstantPool getConstantPool(Program program) throws IOException {
 		return new V8_ConstantPool(program);
 	}
-	
+
 	@Override
 	/**
 	* This method is called by DecompileCallback.getPcodeInject.
@@ -58,7 +58,7 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 			return super.getPayload(type, name, program, context);
 		}
 
-		V8_InjectPayload payload = null; 
+		V8_InjectPayload payload = null;
 		switch (name) {
 		case ("InvokeIntrinsicCallOther"):
 		case ("CallVariadicCallOther"):
@@ -68,13 +68,13 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 		case ("ConstructCallOther"):
 			payload = new V8_InjectConstruct("", language, 0);
 			break;
-		case ("JSCallNCallOther"):	
+		case ("JSCallNCallOther"):
 			payload = new V8_InjectJSCallN("", language, 0);
 			break;
 		case ("CallJSRuntimeCallOther"):
 			payload = new V8_InjectCallJSRuntime("", language, 0);
 			break;
-		case ("ThrowCallOther"):	
+		case ("ThrowCallOther"):
 			payload = new V8_InjectThrow("", language, 0);
 			break;
 		case ("StaDataPropertyInLiteralCallOther"):
