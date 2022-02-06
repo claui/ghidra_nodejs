@@ -6,6 +6,8 @@ import ghidra.program.model.lang.InjectContext;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.PcodeOp;
+import ghidra.xml.XmlParseException;
+import ghidra.xml.XmlPullParser;
 
 public class V8_InjectStaDataPropertyInLiteral extends V8_InjectPayload {
 	public V8_InjectStaDataPropertyInLiteral(String sourceName, SleighLanguage language, long uniqBase) {
@@ -66,5 +68,33 @@ public class V8_InjectStaDataPropertyInLiteral extends V8_InjectPayload {
 	public String getName() {
 		// TODO Auto-generated method stub
 		return "InjectStaDataPropertyInLiteral";
+	}
+
+
+	@Override
+	public boolean isErrorPlaceholder() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean isIncidentalCopy() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public void saveXml(StringBuilder buffer) {
+		// TODO Auto-generated method stub
+
+	}
+
+
+	@Override
+	public void restoreXml(XmlPullParser parser, SleighLanguage language) throws XmlParseException {
+		// TODO Auto-generated method stub
+
 	}
 }

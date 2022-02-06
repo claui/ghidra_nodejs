@@ -8,6 +8,8 @@ import ghidra.program.model.lang.Register;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.PcodeOp;
+import ghidra.xml.XmlParseException;
+import ghidra.xml.XmlPullParser;
 
 
 public class V8_InjectConstruct extends V8_InjectPayload {
@@ -36,6 +38,30 @@ public class V8_InjectConstruct extends V8_InjectPayload {
 		}
 		pCode.emitAssignVarnodeFromPcodeOpCall("acc", 4, "Construct", args);
 		return pCode.getPcodeOps();
+	}
+
+	@Override
+	public boolean isErrorPlaceholder() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isIncidentalCopy() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void saveXml(StringBuilder buffer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void restoreXml(XmlPullParser parser, SleighLanguage language) throws XmlParseException {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -9,6 +9,7 @@ import ghidra.program.model.lang.Register;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.PcodeOp;
+import ghidra.xml.XmlPullParser;
 
 
 public class V8_InjectJSCallN extends V8_InjectPayload {
@@ -88,5 +89,30 @@ public PcodeOp[] getPcode(Program program, InjectContext context) {
 public String getName() {
 	// TODO Auto-generated method stub
 	return "InjectJSCallN";
+}
+
+@Override
+public boolean isErrorPlaceholder() {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+
+@Override
+public boolean isIncidentalCopy() {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+
+@Override
+public void saveXml(StringBuilder buffer) {
+	// TODO Auto-generated method stub
+
+}
+
+@Override
+public void restoreXml(XmlPullParser parser, SleighLanguage unused) {
+
 }
 }

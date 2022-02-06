@@ -48,13 +48,13 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 	/**
 	* This method is called by DecompileCallback.getPcodeInject.
 	*/
-	public InjectPayload getPayload(int type, String name, Program program, String context) {
+	public InjectPayload getPayload(int type, String name) {
 		if (type == InjectPayload.CALLMECHANISM_TYPE) {
 			return null;
 		}
 
 		if (!implementedOps.contains(name)) {
-			return super.getPayload(type, name, program, context);
+			return super.getPayload(type, name);
 		}
 
 		V8_InjectPayload payload = null;
@@ -80,7 +80,7 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 			payload = new V8_InjectStaDataPropertyInLiteral("", language, 0);
 			break;
 		default:
-			return super.getPayload(type, name, program, context);
+			return super.getPayload(type, name);
 		}
 
 		return payload;
