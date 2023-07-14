@@ -3,6 +3,7 @@ package v8_bytecode;
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.lang.InjectContext;
+import ghidra.program.model.lang.InjectPayload;
 import ghidra.program.model.lang.Register;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
@@ -10,12 +11,17 @@ import ghidra.program.model.pcode.PcodeOp;
 import ghidra.xml.XmlParseException;
 import ghidra.xml.XmlPullParser;
 
+import ghidra.xml.XmlPullParser;
+import ghidra.xml.XmlElement;
 
 public class V8_InjectCallVariadic extends V8_InjectPayload {
+	protected SleighLanguage language;
+	protected long uniqueBase;
 
-public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long uniqBase) {
-		super(sourceName, language, uniqBase);
-		// TODO Auto-generated constructor stub
+public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long uniqueBase) {
+		super(sourceName, language, uniqueBase);
+		this.language = language;
+		this.uniqueBase = uniqueBase;
 	}
 
 //	public V8_InjectInvokeIntrinsicCallRuntime(String sourceName, SleighLanguage language) {
@@ -110,33 +116,34 @@ public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long un
 	}
 
 	@Override
+	public boolean isIncidentalCopy() {
+		return false;
+	}
+	
+	@Override
+	public boolean isErrorPlaceholder() {
+		return true;
+	}
+	
+	@Override
+	public void restoreXml(XmlPullParser parser, SleighLanguage lang){
+		XmlElement el = parser.start("V8_InjectCallJSRuntime");
+		parser.end(el);
+	}
+	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
 		return "InjectCallVariadic";
 	}
-
 	@Override
-	public boolean isErrorPlaceholder() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isEquivalent(InjectPayload obj) {
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		V8_InjectCallVariadic op2 = (V8_InjectCallVariadic) obj;
+		if (uniqueBase != op2.uniqueBase) {
+			return false;
+		}
+		return true;
 	}
-
-	@Override
-	public boolean isIncidentalCopy() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void saveXml(StringBuilder buffer) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void restoreXml(XmlPullParser parser, SleighLanguage language) throws XmlParseException {
-		// TODO Auto-generated method stub
-
-	}
-
 }

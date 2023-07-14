@@ -7,27 +7,31 @@ import java.util.Set;
 import org.jdom.JDOMException;
 
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
-import ghidra.pcodeCPort.slgh_compile.PcodeParser;
+import ghidra.pcode.exec.SleighProgramCompiler;
 import ghidra.program.model.lang.ConstantPool;
 import ghidra.program.model.lang.InjectPayload;
 import ghidra.program.model.lang.PcodeInjectLibrary;
+import ghidra.program.model.lang.PcodeParser;
 import ghidra.program.model.listing.Program;
+import ghidra.program.model.pcode.XmlEncode;
 
 public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 	private Set<String> implementedOps;
+	private SleighLanguage language;
+	protected XmlEncode encoder;
 
 	public V8_PcodeInjectLibrary(SleighLanguage l) {
 		super(l);
 		language = l;
-		String translateSpec = language.buildTranslatorTag(language.getAddressFactory(),
-				getUniqueBase(), language.getSymbolTable());
-		PcodeParser parser = null;
+		encoder = new XmlEncode();
 		try {
-			parser = new PcodeParser(translateSpec);
+			language.encodeTranslator(encoder, language.getAddressFactory(), getUniqueBase());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		catch (JDOMException e1) {
-			e1.printStackTrace();
-		}
+		String translateSpec = encoder.toString();
+		PcodeParser parser = null;
+		parser = SleighProgramCompiler.createParser(language);
 		implementedOps = new HashSet<>();
 		implementedOps.add("InvokeIntrinsicCallOther");
 		implementedOps.add("CallRuntimeCallOther");
@@ -46,8 +50,8 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 
 	@Override
 	/**
-	* This method is called by DecompileCallback.getPcodeInject.
-	*/
+	 * This method is called by DecompileCallback.getPcodeInject.
+	 */
 	public InjectPayload getPayload(int type, String name) {
 		if (type == InjectPayload.CALLMECHANISM_TYPE) {
 			return null;
@@ -59,28 +63,28 @@ public class V8_PcodeInjectLibrary extends PcodeInjectLibrary {
 
 		V8_InjectPayload payload = null;
 		switch (name) {
-		case ("InvokeIntrinsicCallOther"):
-		case ("CallVariadicCallOther"):
-		case ("CallRuntimeCallOther"):
-			payload = new V8_InjectCallVariadic("", language, 0);
-			break;
-		case ("ConstructCallOther"):
-			payload = new V8_InjectConstruct("", language, 0);
-			break;
-		case ("JSCallNCallOther"):
-			payload = new V8_InjectJSCallN("", language, 0);
-			break;
-		case ("CallJSRuntimeCallOther"):
-			payload = new V8_InjectCallJSRuntime("", language, 0);
-			break;
-		case ("ThrowCallOther"):
-			payload = new V8_InjectThrow("", language, 0);
-			break;
-		case ("StaDataPropertyInLiteralCallOther"):
-			payload = new V8_InjectStaDataPropertyInLiteral("", language, 0);
-			break;
-		default:
-			return super.getPayload(type, name);
+			case ("InvokeIntrinsicCallOther"):
+			case ("CallVariadicCallOther"):
+			case ("CallRuntimeCallOther"):
+				payload = new V8_InjectCallVariadic("", language, 0);
+				break;
+			case ("ConstructCallOther"):
+				payload = new V8_InjectConstruct("", language, 0);
+				break;
+			case ("JSCallNCallOther"):
+				payload = new V8_InjectJSCallN("", language, 0);
+				break;
+			case ("CallJSRuntimeCallOther"):
+				payload = new V8_InjectCallJSRuntime("", language, 0);
+				break;
+			case ("ThrowCallOther"):
+				payload = new V8_InjectThrow("", language, 0);
+				break;
+			case ("StaDataPropertyInLiteralCallOther"):
+				payload = new V8_InjectStaDataPropertyInLiteral("", language, 0);
+				break;
+			default:
+				return super.getPayload(type, name);
 		}
 
 		return payload;

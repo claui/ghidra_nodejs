@@ -1,20 +1,29 @@
 package v8_bytecode;
 
+import ghidra.app.plugin.processors.sleigh.*;
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
+import ghidra.app.plugin.processors.sleigh.template.*;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.lang.InjectContext;
+import ghidra.program.model.lang.InjectPayload;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
+import ghidra.program.model.pcode.*;
 import ghidra.program.model.pcode.PcodeOp;
+import ghidra.xml.*;
+import ghidra.xml.XmlElement;
 import ghidra.xml.XmlParseException;
 import ghidra.xml.XmlPullParser;
 
-public class V8_InjectThrow  extends V8_InjectPayload {
-	public V8_InjectThrow(String sourceName, SleighLanguage language, long uniqBase) {
-		super(sourceName, language, uniqBase);
-		// TODO Auto-generated constructor stub
-	}
+public class V8_InjectThrow extends V8_InjectPayload {
+	protected SleighLanguage language;
+	protected long uniqueBase;
 
+	public V8_InjectThrow(String sourceName, SleighLanguage language, long uniqueBase) {
+		super(sourceName, language, uniqueBase);
+		this.language = language;
+		this.uniqueBase = uniqueBase;
+	}
 
 	@Override
 	public PcodeOp[] getPcode(Program program, InjectContext context) {
@@ -31,26 +40,27 @@ public class V8_InjectThrow  extends V8_InjectPayload {
 		Integer runtimeid = (int) context.inputlist.get(1).getOffset();
 
 		if (condition > 0) {
-			pCode.emitConditionalBranchVarnode(instruction.getNext().getAddress(), condition,  4, "TheHole");
+			pCode.emitConditionalBranchVarnode(instruction.getNext().getAddress(), condition, 4, "TheHole");
 		}
 		Integer funcType = 0;
 		if (instruction.getMnemonicString().compareTo("ThrowReferenceErrorIfHole") == 0) {
 			fIdx = 1;
 			Integer idx = (int) instruction.getScalar(0).getValue();
-			pCode.emitAssignVarnodeFromPcodeOpCall("cp", 4, "cpool", "0", "0x" + opAddr.toString(), idx.toString(), funcType.toString());
+			pCode.emitAssignVarnodeFromPcodeOpCall("cp", 4, "cpool", "0", "0x" + opAddr.toString(), idx.toString(),
+					funcType.toString());
 		}
 		// get runtime function
-		 funcType = 2;
-		pCode.emitAssignVarnodeFromPcodeOpCall("call_target", 4, "cpool", "0", "0x" + opAddr.toString(), runtimeid.toString(), funcType.toString());
+		funcType = 2;
+		pCode.emitAssignVarnodeFromPcodeOpCall("call_target", 4, "cpool", "0", "0x" + opAddr.toString(),
+				runtimeid.toString(), funcType.toString());
 		try {
 			callerParamsCount = program.getListing().getFunctionContaining(opAddr).getParameterCount();
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			callerParamsCount = 0;
 		}
 		// get caller args count to save only necessary ones
 		// it does not match the logic of the node.exe but important for output quality
-		if (callerParamsCount >  fIdx + 1) {
+		if (callerParamsCount > fIdx + 1) {
 			callerParamsCount = fIdx + 1;
 		}
 
@@ -71,38 +81,42 @@ public class V8_InjectThrow  extends V8_InjectPayload {
 		return pCode.getPcodeOps();
 	}
 
-
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
 		return "InjectThrow";
 	}
 
-
 	@Override
-	public boolean isErrorPlaceholder() {
+	public void encode(Encoder encoder)  {
 		// TODO Auto-generated method stub
-		return false;
 	}
-
 
 	@Override
 	public boolean isIncidentalCopy() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
-
 	@Override
-	public void saveXml(StringBuilder buffer) {
-		// TODO Auto-generated method stub
-
+	public boolean isErrorPlaceholder() {
+		return true;
+	}
+	
+	@Override
+	public void restoreXml(XmlPullParser parser, SleighLanguage lang) {
+		XmlElement el = parser.start("V8_InjectThrow");
+		parser.end(el);
 	}
 
-
 	@Override
-	public void restoreXml(XmlPullParser parser, SleighLanguage language) throws XmlParseException {
-		// TODO Auto-generated method stub
-
+	public boolean isEquivalent(InjectPayload obj) {
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		V8_InjectThrow op2 = (V8_InjectThrow) obj;
+		if (uniqueBase != op2.uniqueBase) {
+			return false;
+		}
+		return true;
 	}
 }

@@ -3,24 +3,27 @@ package v8_bytecode;
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.lang.InjectContext;
+import ghidra.program.model.lang.InjectPayload;
 import ghidra.program.model.lang.Register;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.PcodeOp;
-import ghidra.xml.XmlParseException;
+import ghidra.xml.XmlElement;
 import ghidra.xml.XmlPullParser;
 
 public class V8_InjectCallJSRuntime extends V8_InjectPayload {
+	protected SleighLanguage language;
+	protected long uniqueBase;
 
-	public V8_InjectCallJSRuntime(String sourceName, SleighLanguage language, long uniqBase) {
-		super(sourceName, language, uniqBase);
-		// TODO Auto-generated constructor stub
+	public V8_InjectCallJSRuntime(String sourceName, SleighLanguage language, long uniqueBase) {
+		super(sourceName, language, uniqueBase);
+		this.language = language;
+		this.uniqueBase = uniqueBase;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "callJSRuntime";
 	}
 
 	@Override
@@ -69,29 +72,32 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 		}
 		return pCode.getPcodeOps();
 	}
-
 	@Override
-	public boolean isErrorPlaceholder() {
-		// TODO Auto-generated method stub
-		return false;
+	public void restoreXml(XmlPullParser parser, SleighLanguage lang){
+		XmlElement el = parser.start("V8_InjectCallJSRuntime");
+		parser.end(el);
 	}
-
+	
+	
 	@Override
 	public boolean isIncidentalCopy() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	@Override
-	public void saveXml(StringBuilder buffer) {
-		// TODO Auto-generated method stub
-
+	public boolean isErrorPlaceholder() {
+		return true;
 	}
 
 	@Override
-	public void restoreXml(XmlPullParser parser, SleighLanguage language) throws XmlParseException {
-		// TODO Auto-generated method stub
-
+	public boolean isEquivalent(InjectPayload obj) {
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		V8_InjectCallJSRuntime op2 = (V8_InjectCallJSRuntime) obj;
+		if (uniqueBase != op2.uniqueBase) {
+			return false;
+		}
+		return true;
 	}
-
 }

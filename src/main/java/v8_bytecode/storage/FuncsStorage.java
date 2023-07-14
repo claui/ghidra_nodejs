@@ -8,14 +8,19 @@ import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import ghidra.app.plugin.processors.sleigh.*;
+import ghidra.app.plugin.processors.sleigh.template.*;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.listing.Program;
+import ghidra.program.model.pcode.*;
 import ghidra.program.model.util.ObjectPropertyMap;
 import ghidra.program.model.util.PropertyMapManager;
 import ghidra.util.ObjectStorage;
 import ghidra.util.PrivateSaveable;
 import ghidra.util.exception.DuplicateNameException;
+import ghidra.xml.*;
 import v8_bytecode.EnumsStorage;
+import ghidra.program.model.util.PropertyMap;
 
 public final class FuncsStorage extends PrivateSaveable {
 
@@ -50,16 +55,16 @@ public final class FuncsStorage extends PrivateSaveable {
 	
 	public static FuncsStorage load(Program program) {
 		PropertyMapManager mgr = program.getUsrPropertyManager();
-		ObjectPropertyMap map = mgr.getObjectPropertyMap("FS");
+		PropertyMap<?> map = mgr.getPropertyMap("FS");
 
-		return (FuncsStorage) map.getObject(program.getAddressFactory().getDefaultAddressSpace().getAddress(STOR_ADDR));
+		return (FuncsStorage) map.get(program.getAddressFactory().getDefaultAddressSpace().getAddress(STOR_ADDR));
 	}
 	
 	public void store(Program program) {
 		int transId = program.startTransaction("Save FuncsStorage");
 		
 		PropertyMapManager mgr = program.getUsrPropertyManager();
-		ObjectPropertyMap map = mgr.getObjectPropertyMap("FS");
+		PropertyMap<?> map = mgr.getPropertyMap("FS");
 		map.remove(program.getAddressFactory().getDefaultAddressSpace().getAddress(STOR_ADDR));
 		map.add(program.getAddressFactory().getDefaultAddressSpace().getAddress(STOR_ADDR), this);
 		

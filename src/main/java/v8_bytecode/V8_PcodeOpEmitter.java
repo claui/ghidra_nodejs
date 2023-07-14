@@ -102,7 +102,7 @@ public class V8_PcodeOpEmitter {
 		return PcodeOp.COPY;
 	}
 
-	public V8_PcodeOpEmitter(SleighLanguage language, Address opAddr, long uniqBase) {
+	public V8_PcodeOpEmitter(SleighLanguage language, Address opAddr, long uniqueBase) {
 		Method getSpaceId = null;
 		nameToReg = new HashMap<String, Varnode>();
 		opList = new ArrayList<PcodeOp>();
@@ -110,7 +110,7 @@ public class V8_PcodeOpEmitter {
 		constSpace = language.getAddressFactory().getConstantSpace();
 		defSpace = language.getDefaultSpace();
 		uniqueSpace = language.getAddressFactory().getUniqueSpace();
-		uniqueBase = uniqBase;
+		uniqueBase = uniqueBase;
 		opAddress = opAddr;
 		seqnum = 0; 
 		spVarnode = findRegister("sp");

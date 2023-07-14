@@ -23,13 +23,25 @@ if (System.env.GHIDRA_INSTALL_DIR) {
 else if (project.hasProperty("GHIDRA_INSTALL_DIR")) {
 	ghidraInstallDir = project.getProperty("GHIDRA_INSTALL_DIR")
 }
-
+import org.gradle.api.GradleException
 if (ghidraInstallDir) {
+	// parse <ghidraInstallDir>/Ghidra/application.properties to get the version of Gradle to use (it has the format `application.gradle.min=7.3` and `application.gradle.max=9.1`)
+	def applicationProperties = new Properties()
+	applicationProperties.load(new FileInputStream(new File(ghidraInstallDir).getCanonicalPath() + "/Ghidra/application.properties"))
+	def gradleMin = applicationProperties.getProperty("application.gradle.min")
+	def gradleMax = applicationProperties.getProperty("application.gradle.max")
+	// check if the current Gradle version is compatible with the Ghidra installation
+	def gradleVersion = GradleVersion.current()
+	if ((gradleMin != '' && gradleVersion < GradleVersion.version(gradleMin)) || (gradleMax != '' && gradleVersion > GradleVersion.version(gradleMax))) {
+		throw new GradleException("Gradle version " + gradleVersion + " is not compatible with Ghidra version " + gradleMin + " to " + gradleMax + ".  Please use Gradle version " + gradleMin + " to " + gradleMax + ".")
+	}
+
 	apply from: new File(ghidraInstallDir).getCanonicalPath() + "/support/buildExtension.gradle"
 }
-else {
+else if (project.hasProperty("task") && project.getProperty("task").equals("build")) {
 	throw new GradleException("GHIDRA_INSTALL_DIR is not defined!")
 }
+
 //----------------------END "DO NOT MODIFY" SECTION-------------------------------
 
 import org.gradle.plugins.ide.eclipse.model.Library
