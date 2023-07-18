@@ -30,7 +30,7 @@
 		<link>
 			<name>Ghidra</name>
 			<type>2</type>
-			<location>C:/Users/User/AppData/Local/Programs/ghidra_10.3.2_PUBLIC</location>
+			<location>{{ GHIDRA_INSTALL_DIR }}</location>
 		</link>
 	</linkedResources>
 	<filteredResources>

@@ -40,7 +40,29 @@ else if (project.hasProperty("GHIDRA_INSTALL_DIR")) {
 }
 
 if (ghidraInstallDir) {
-	apply from: new File(ghidraInstallDir).getCanonicalPath() + "/support/buildExtension.gradle"
+	// first, replace all {{ GHIDRA_INSTALL_DIR }} placeholders in ./.classpath, ./.project, ./.antProperties.xml with ghidraInstallDir (forward slash path separator)
+	def canonicalPath = new File(ghidraInstallDir).getCanonicalPath()
+	def classpathFile = new File("./.classpath")
+	def projectFile = new File("./.project")
+	def antPropertiesFile = new File("./.antProperties.xml")
+	def classpathText = classpathFile.text
+	def projectText = projectFile.text
+	def antPropertiesText = antPropertiesFile.text
+	def classpathTextReplaced = classpathText.replaceAll("\\{\\{ GHIDRA_INSTALL_DIR \\}\\}", canonicalPath.replace("\\", "/"))
+	def projectTextReplaced = projectText.replaceAll("\\{\\{ GHIDRA_INSTALL_DIR \\}\\}", canonicalPath.replace("\\", "/"))
+	def antPropertiesTextReplaced = antPropertiesText.replaceAll("\\{\\{ GHIDRA_INSTALL_DIR \\}\\}", canonicalPath.replace("\\", "/"))
+	classpathFile.text = classpathTextReplaced
+	projectFile.text = projectTextReplaced
+	projectFile.write(projectTextReplaced)
+	antPropertiesFile.text = antPropertiesTextReplaced
+	antPropertiesFile.write(antPropertiesTextReplaced)
+	// second, replace all {{ GHIDRA_INSTALL_URI }}	placeholders in ./.classpath with ghidraInstallDir (backslash path separator)
+	def classpathTextReplaced2 = classpathTextReplaced.replace("{{ GHIDRA_INSTALL_URI }}", canonicalPath.replace("/", "\\\\"))
+	classpathFile.text = classpathTextReplaced2
+	// write the changes to ./.classpath
+	classpathFile.write(classpathTextReplaced2)
+
+	apply from: canonicalPath + "/support/buildExtension.gradle"
 }
 else {
 	throw new GradleException("GHIDRA_INSTALL_DIR is not defined!")
