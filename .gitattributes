@@ -1,37 +1,9 @@
-# CAUTION:
-# Always run the following command after adding/editing an
-# `eol` entry:
 #
-#   git add --renormalize FILES_WITH_AFFECTED_EXTENSION
+# https://help.github.com/articles/dealing-with-line-endings/
 #
-# This keeps existing files consistent with the new setting.
-#
-# Example:
-#
-#   git add --renormalize '*.foo' '*.bar'
+# Linux start script should use lf
+/gradlew        text eol=lf
 
-.editorconfig   text eol=lf
-.gitattributes  text eol=lf
+# These are Windows script files and should use crlf
+*.bat           text eol=crlf
 
-# LF required for interactive patching as of Git 2.17.1
-*.diff          text eol=lf
-*.patch         text eol=lf
-
-*.cspec         text eol=lf
-*.css           text eol=lf
-*.gradle        text eol=lf
-*.html          text eol=lf
-*.java          text eol=lf
-*.js            text eol=lf
-*.json          text eol=lf
-*.ldefs         text eol=lf
-*.md            text eol=lf
-*.prefs         text eol=lf
-*.project       text eol=lf
-*.properties    text eol=lf
-*.pspec         text eol=lf
-*.sinc          text eol=lf
-*.sla           text eol=lf
-*.slaspec       text eol=lf
-*.txt           text eol=lf
-*.xml           text eol=lf
