@@ -1,3 +1,18 @@
+/* ###
+ * IP: GHIDRA
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 // Builds a Ghidra Extension for a given Ghidra installation.
 //
 // An absolute path to the Ghidra installation directory must be supplied either by setting the 
@@ -25,9 +40,46 @@ else if (project.hasProperty("GHIDRA_INSTALL_DIR")) {
 }
 
 if (ghidraInstallDir) {
-	apply from: new File(ghidraInstallDir).getCanonicalPath() + "/support/buildExtension.gradle"
+	// first, replace all {{ GHIDRA_INSTALL_DIR }} placeholders in ./.classpath, ./.project, ./.antProperties.xml with ghidraInstallDir (forward slash path separator)
+	def canonicalPath = new File(ghidraInstallDir).getCanonicalPath()
+	def classpathFile = new File("./.classpath")
+	def projectFile = new File("./.project")
+	def antPropertiesFile = new File("./.antProperties.xml")
+	def classpathText = classpathFile.text
+	def projectText = projectFile.text
+	def antPropertiesText = antPropertiesFile.text
+	def classpathTextReplaced = classpathText.replaceAll("\\{\\{ GHIDRA_INSTALL_DIR \\}\\}", canonicalPath.replace("\\", "/"))
+	def projectTextReplaced = projectText.replaceAll("\\{\\{ GHIDRA_INSTALL_DIR \\}\\}", canonicalPath.replace("\\", "/"))
+	def antPropertiesTextReplaced = antPropertiesText.replaceAll("\\{\\{ GHIDRA_INSTALL_DIR \\}\\}", canonicalPath.replace("\\", "/"))
+	classpathFile.text = classpathTextReplaced
+	projectFile.text = projectTextReplaced
+	projectFile.write(projectTextReplaced)
+	antPropertiesFile.text = antPropertiesTextReplaced
+	antPropertiesFile.write(antPropertiesTextReplaced)
+	// second, replace all {{ GHIDRA_INSTALL_URI }}	placeholders in ./.classpath with ghidraInstallDir (backslash path separator)
+	def classpathTextReplaced2 = classpathTextReplaced.replace("{{ GHIDRA_INSTALL_URI }}", canonicalPath.replace("/", "\\\\"))
+	classpathFile.text = classpathTextReplaced2
+	// write the changes to ./.classpath
+	classpathFile.write(classpathTextReplaced2)
+
+	apply from: canonicalPath + "/support/buildExtension.gradle"
 }
 else {
 	throw new GradleException("GHIDRA_INSTALL_DIR is not defined!")
 }
 //----------------------END "DO NOT MODIFY" SECTION-------------------------------
+
+repositories {
+	// Declare dependency repositories here.  This is not needed if dependencies are manually 
+	// dropped into the lib/ directory.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html for more info.
+	// Ex: mavenCentral()
+}
+
+dependencies {
+	// Any external dependencies added here will automatically be copied to the lib/ directory when
+	// this extension is built.	
+}
+
+// Exclude additional files from the built extension
+// Ex: buildExtension.exclude '.idea/**'
