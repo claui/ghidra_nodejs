@@ -3,17 +3,25 @@ package v8_bytecode;
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.lang.InjectContext;
+import ghidra.program.model.lang.InjectPayload;
 import ghidra.program.model.lang.Register;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.PcodeOp;
+import ghidra.xml.XmlParseException;
+import ghidra.xml.XmlPullParser;
 
+import ghidra.xml.XmlPullParser;
+import ghidra.xml.XmlElement;
 
 public class V8_InjectCallVariadic extends V8_InjectPayload {
+	protected SleighLanguage language;
+	protected long uniqueBase;
 
-public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long uniqBase) {
-		super(sourceName, language, uniqBase);
-		// TODO Auto-generated constructor stub
+public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long uniqueBase) {
+		super(sourceName, language, uniqueBase);
+		this.language = language;
+		this.uniqueBase = uniqueBase;
 	}
 
 //	public V8_InjectInvokeIntrinsicCallRuntime(String sourceName, SleighLanguage language) {
@@ -24,15 +32,15 @@ public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long un
 	int INTRINSICTYPE = 1;
 	int RUNTIMETYPE = 2;
 	int PROPERTYTYPE = 3;
-	
+
 	@Override
 	public PcodeOp[] getPcode(Program program, InjectContext context) {
 		Integer callerParamsCount;
 		Integer argIndex = 0;
 		Integer callerArgIndex = 0;
-		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 
+		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 		Address opAddr = context.baseAddr;
-		
+
 		Instruction instruction = program.getListing().getInstructionAt(opAddr);
 		// get arguments from slaspec, definition in cspec
 		Integer funcType = (int) context.inputlist.get(0).getOffset();
@@ -40,7 +48,7 @@ public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long un
 		// extract and convert runtime id if runtime/intrinsic function called
 		if (funcType != PROPERTYTYPE) {
 			Integer index = (int) instruction.getScalar(0).getValue();
-			pCode.emitAssignVarnodeFromPcodeOpCall("call_target", 4, "cpool", "0", "0x" + opAddr.toString(), index.toString(), 
+			pCode.emitAssignVarnodeFromPcodeOpCall("call_target", 4, "cpool", "0", "0x" + opAddr.toString(), index.toString(),
 					funcType.toString());
 		}
 		else {
@@ -70,7 +78,7 @@ public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long un
 		}
 		if (callerParamsCount >  opObjects.length) {
 			callerParamsCount = opObjects.length;
-		}	
+		}
 		for (; callerArgIndex < callerParamsCount; callerArgIndex++) {
 			pCode.emitPushCat1Value("a" + callerArgIndex);
 		}
@@ -102,15 +110,40 @@ public V8_InjectCallVariadic(String sourceName, SleighLanguage language, long un
 //		//	*:4 fixset_addr = ret2:4;
 //		//  *:4 (fixset_addr+4) = ret2[4,8];
 //		}
-		
+
 
 		return pCode.getPcodeOps();
 	}
 
 	@Override
+	public boolean isIncidentalCopy() {
+		return false;
+	}
+	
+	@Override
+	public boolean isErrorPlaceholder() {
+		return true;
+	}
+	
+	@Override
+	public void restoreXml(XmlPullParser parser, SleighLanguage lang){
+		XmlElement el = parser.start("V8_InjectCallJSRuntime");
+		parser.end(el);
+	}
+	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
 		return "InjectCallVariadic";
 	}
-
+	@Override
+	public boolean isEquivalent(InjectPayload obj) {
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		V8_InjectCallVariadic op2 = (V8_InjectCallVariadic) obj;
+		if (uniqueBase != op2.uniqueBase) {
+			return false;
+		}
+		return true;
+	}
 }

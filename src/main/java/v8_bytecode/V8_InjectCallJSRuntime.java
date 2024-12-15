@@ -3,27 +3,32 @@ package v8_bytecode;
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
 import ghidra.program.model.address.Address;
 import ghidra.program.model.lang.InjectContext;
+import ghidra.program.model.lang.InjectPayload;
 import ghidra.program.model.lang.Register;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Program;
 import ghidra.program.model.pcode.PcodeOp;
+import ghidra.xml.XmlElement;
+import ghidra.xml.XmlPullParser;
 
 public class V8_InjectCallJSRuntime extends V8_InjectPayload {
+	protected SleighLanguage language;
+	protected long uniqueBase;
 
-	public V8_InjectCallJSRuntime(String sourceName, SleighLanguage language, long uniqBase) {
-		super(sourceName, language, uniqBase);
-		// TODO Auto-generated constructor stub
+	public V8_InjectCallJSRuntime(String sourceName, SleighLanguage language, long uniqueBase) {
+		super(sourceName, language, uniqueBase);
+		this.language = language;
+		this.uniqueBase = uniqueBase;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "callJSRuntime";
 	}
 
 	@Override
 	public PcodeOp[] getPcode(Program program, InjectContext context) {
-		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase); 
+		V8_PcodeOpEmitter pCode = new V8_PcodeOpEmitter(language, context.baseAddr, uniqueBase);
 		Address opAddr = context.baseAddr;
 		Integer callerParamsCount;
 		Integer argIndex = 0;
@@ -31,7 +36,7 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 		Instruction instruction = program.getListing().getInstructionAt(opAddr);
 		Object[] opObjects = instruction.getOpObjects(2);
 		String[] args = new String[opObjects.length + 1];
-		
+
 		try {
 			callerParamsCount = program.getListing().getFunctionContaining(opAddr).getParameterCount();
 		}
@@ -40,7 +45,7 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 		}
 		if (callerParamsCount >  opObjects.length) {
 			callerParamsCount = opObjects.length;
-		}	
+		}
 		for (; callerArgIndex < callerParamsCount; callerArgIndex++) {
 			pCode.emitPushCat1Value("a" + callerArgIndex);
 		}
@@ -67,5 +72,32 @@ public class V8_InjectCallJSRuntime extends V8_InjectPayload {
 		}
 		return pCode.getPcodeOps();
 	}
+	@Override
+	public void restoreXml(XmlPullParser parser, SleighLanguage lang){
+		XmlElement el = parser.start("V8_InjectCallJSRuntime");
+		parser.end(el);
+	}
+	
+	
+	@Override
+	public boolean isIncidentalCopy() {
+		return false;
+	}
+	
+	@Override
+	public boolean isErrorPlaceholder() {
+		return true;
+	}
 
+	@Override
+	public boolean isEquivalent(InjectPayload obj) {
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		V8_InjectCallJSRuntime op2 = (V8_InjectCallJSRuntime) obj;
+		if (uniqueBase != op2.uniqueBase) {
+			return false;
+		}
+		return true;
+	}
 }

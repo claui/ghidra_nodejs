@@ -1,20 +1,26 @@
 package v8_bytecode;
 
+import java.io.IOException;
+
+import ghidra.app.plugin.processors.sleigh.*;
 import ghidra.app.plugin.processors.sleigh.PcodeEmit;
 import ghidra.app.plugin.processors.sleigh.SleighLanguage;
+import ghidra.app.plugin.processors.sleigh.template.*;
 import ghidra.program.model.lang.InjectContext;
 import ghidra.program.model.lang.InjectPayload;
+import ghidra.program.model.pcode.*;
+import ghidra.xml.*;
+import ghidra.program.model.util.PropertyMap;
 
 public abstract class V8_InjectPayload implements InjectPayload {
 	protected SleighLanguage language;
 	protected long uniqueBase;
 	private String sourceName;
 
-	public V8_InjectPayload(String sourceName, SleighLanguage language, long uniqBase) {
-//		super(sourceName);
+	protected V8_InjectPayload(String sourceName, SleighLanguage language, long uniqueBase) {
 		this.language = language;
 		this.sourceName = sourceName;
-		this.uniqueBase = uniqBase;
+		this.uniqueBase = uniqueBase;
 
 	}
 
@@ -51,6 +57,10 @@ public abstract class V8_InjectPayload implements InjectPayload {
 	@Override
 	public InjectParameter[] getOutput() {
 		return null;
+	}
+	@Override
+	public void encode(Encoder encoder) {
+		//TODO: Implement
 	}
 
 }

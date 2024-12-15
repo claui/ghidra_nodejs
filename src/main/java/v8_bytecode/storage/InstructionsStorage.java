@@ -50,7 +50,7 @@ public final class InstructionsStorage extends PrivateSaveable {
 			return null;
 		}
 
-		return (InstructionsStorage) map.getObject(program.getAddressFactory().getDefaultAddressSpace().getAddress(address));
+		return (InstructionsStorage) map.get(program.getAddressFactory().getDefaultAddressSpace().getAddress(address));
 	}
 	
 	@Override
